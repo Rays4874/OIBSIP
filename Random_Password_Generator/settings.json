@@ -1,0 +1,10 @@
+{
+    "length": 17,
+    "uppercase": true,
+    "lowercase": true,
+    "numbers": true,
+    "symbols": true,
+    "exclude_ambiguous": true,
+    "prevent_repeats": true,
+    "policy": "Enterprise"
+}
