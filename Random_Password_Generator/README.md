@@ -301,6 +301,5 @@ Version: 1.0.0
 
 ---
 
-## 📄 License
-
+📄 License
 This project is intended for educational and portfolio purposes.
