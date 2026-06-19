@@ -135,7 +135,7 @@ def create_weather_app():
 
     root = tk.Tk()
     root.title("Weather Forecast App")
-    root.geometry("920x800")
+    root.geometry("1000x900")
     root.resizable(False, False)
     root.configure(bg=t["bg"])
 
