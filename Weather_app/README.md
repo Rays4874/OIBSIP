@@ -161,16 +161,16 @@ python main.py
 ## 📸 Screenshots
 
 ### Dark Theme
+<img width="1241" height="1078" alt="Screenshot 2026-06-19 202010" src="https://github.com/user-attachments/assets/bba18002-e599-4a79-bc87-c6df49c1f417" />
 
-*Add screenshot here*
 
 ### Light Theme
+<img width="1251" height="1077" alt="Screenshot 2026-06-19 202239" src="https://github.com/user-attachments/assets/493468c3-0c48-472c-9ed1-8229526fdc1b" />
 
-*Add screenshot here*
 
 ### Weather Forecast View
+<img width="1112" height="867" alt="Screenshot 2026-06-19 202400" src="https://github.com/user-attachments/assets/aa873938-3fa3-494a-8f4f-f45717cca033" />
 
-*Add screenshot here*
 
 ---
 
