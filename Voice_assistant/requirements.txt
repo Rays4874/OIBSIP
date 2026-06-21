@@ -1,0 +1,12 @@
+SpeechRecognition
+PyAudio
+edge-tts
+pygame
+requests
+python-dotenv
+email-validator
+dateparser
+playsound
+plyer
+psutil
+ollama
