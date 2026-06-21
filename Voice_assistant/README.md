@@ -184,29 +184,63 @@ Benefits:
 # 🏗️ Project Architecture
 
 Voice_assitant/
-├── main.py
-├── modules/
-│ ├── chat_ai.py
-│ ├── weather.py
-│ ├── email_module.py
-│ ├── reminder.py
-│ ├── memory.py
-│ └── plugin_manager.py
+C:.
+│   .env
+│   .gitignore
+│   alarm.mp3
+│   main.py
+│   README.md
+│   requirements.txt
 │
-├── plugins/
-│ ├── calculator_plugin.py
-│ ├── joke_plugin.py
-│ └── custom_plugins.py
+├───database
+│       emails.db
+│       reminders.db
 │
-├── memory/
-│ ├── conversation.json
-│ └── user_memory.json
+├───gui
+│   │   dashboard.py
+│   │
+│   └───__pycache__
+│           dashboard.cpython-313.pyc
 │
-├── database/
-│ └── reminders.db
+├───memory
+│       conversation.json
+│       user_memory.json
 │
-├── requirements.txt
-└── README.md
+├───modules
+│   │   chat_ai.py
+│   │   email_module.py
+│   │   memory.py
+│   │   plugin_manager.py
+│   │   reminder.py
+│   │   system_control.py
+│   │   wake_word.py
+│   │   weather.py
+│   │
+│   ├───database
+│   │       emails.db
+│   │
+│   └───__pycache__
+│           chat_ai.cpython-313.pyc
+│           email_module.cpython-313.pyc
+│           memory.cpython-313.pyc
+│           plugin_manager.cpython-313.pyc
+│           reminder.cpython-313.pyc
+│           system_control.cpython-313.pyc
+│           wake_word.cpython-313.pyc
+│           weather.cpython-313.pyc
+│
+├───plugins
+│   │   calculator_plugin.py
+│   │   joke_plugin.py
+│   │   weather_plugin.py
+│   │
+│   └───__pycache__
+│           calculator_plugin.cpython-313.pyc
+│           joke_plugin.cpython-313.pyc
+│           weather_plugin.cpython-313.pyc
+│
+└───__pycache__
+        main.cpython-313.pyc
 
 ---
 
