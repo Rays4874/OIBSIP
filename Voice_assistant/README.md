@@ -183,30 +183,40 @@ Benefits:
 
 # 🏗️ Project Architecture
 
-Voice_assitant/
+```text
+Voice_assistant/
+│
 ├── main.py
-├── modules/
-│ ├── chat_ai.py
-│ ├── weather.py
-│ ├── email_module.py
-│ ├── reminder.py
-│ ├── memory.py
-│ └── plugin_manager.py
-│
-├── plugins/
-│ ├── calculator_plugin.py
-│ ├── joke_plugin.py
-│ └── custom_plugins.py
-│
-├── memory/
-│ ├── conversation.json
-│ └── user_memory.json
+├── README.md
+├── requirements.txt
 │
 ├── database/
-│ └── reminders.db
+│   ├── emails.db
+│   └── reminders.db
 │
-├── requirements.txt
-└── README.md
+├── gui/
+│   └── dashboard.py
+│
+├── memory/
+│   ├── conversation.json
+│   └── user_memory.json
+│
+├── modules/
+│   ├── chat_ai.py
+│   ├── email_module.py
+│   ├── memory.py
+│   ├── plugin_manager.py
+│   ├── reminder.py
+│   ├── system_control.py
+│   ├── wake_word.py
+│   └── weather.py
+│
+└── plugins/
+    ├── calculator_plugin.py
+    ├── joke_plugin.py
+    └── weather_plugin.py
+```
+
 
 ---
 
