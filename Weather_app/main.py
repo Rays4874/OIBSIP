@@ -445,7 +445,6 @@ def create_weather_app():
         search_btn.config(state="normal", text="🔍  Search")
         location_btn.config(state="normal", text="📍  Use Current Location")
 
-    # NOTE: forecast_data (OWM) parameter removed since we use daily_data for both now!
     def show_data(current_data: dict, aqi_data: dict, daily_data: dict, source: str = "searched"):
         th = THEMES[current_theme]
 
