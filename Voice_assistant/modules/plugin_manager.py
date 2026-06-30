@@ -55,7 +55,6 @@ def handle_command(command, speak_callback):
             
         for trigger in data["triggers"]:
             if trigger in command:
-                # Execute the plugin and speak its return value
                 response = data["execute"](command)
                 if response:
                     speak_callback(response)

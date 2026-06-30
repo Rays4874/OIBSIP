@@ -45,7 +45,6 @@ THEMES = {
 }
 
 current_theme = "dark"
-# We removed "forecast" from the cache since Open-Meteo handles both now!
 weather_cache = {"current": None, "aqi": None, "daily": None, "source": ""}
 
 CONDITION_ICONS = {
@@ -511,26 +510,22 @@ def create_weather_app():
                                  font=tkfont.Font(family="Helvetica", size=10, weight="bold"), pady=4)
             alert_lbl.pack(fill="x", pady=(0, 4), padx=30)
 
-        # ── NEW: True Hourly 24-Hour Forecast (Open-Meteo) ──
         if daily_data and "hourly" in daily_data:
             hourly = daily_data["hourly"]
 
-            # 1. Calculate the exact local time of the city searched
             city_time = datetime.now(timezone.utc) + timedelta(seconds=current_data["timezone"])
             current_hour_str = city_time.strftime("%Y-%m-%dT%H:00")
 
-            # 2. Find where that hour is in the API array
             start_idx = 0
             for idx, t_str in enumerate(hourly["time"]):
                 if t_str >= current_hour_str:
                     start_idx = idx
                     break
 
-            # 3. Build exactly 24 hourly cards
             for i in range(start_idx, start_idx + 24):
-                if i >= len(hourly["time"]): break  # Failsafe
+                if i >= len(hourly["time"]): break 
 
-                time_str = hourly["time"][i][11:16]  # Gets just the HH:MM
+                time_str = hourly["time"][i][11:16]
                 temp = hourly["temperature_2m"][i]
                 wmo_code = hourly["weathercode"][i]
                 cond = get_condition_from_wmo(wmo_code)
@@ -538,7 +533,6 @@ def create_weather_app():
                 f_card = tk.Frame(scrollable_frame_24, bg=th["bg"], padx=15, pady=8, bd=1, relief="ridge")
                 f_card.pack(side="left", padx=5, fill="y")
 
-                # Make the very first card say "Now" instead of the time
                 display_time = "Now" if i == start_idx else time_str
                 tk.Label(f_card, text=display_time, font=forecast_time_font, bg=th["bg"], fg=th["fg_muted"]).pack()
 
@@ -552,7 +546,6 @@ def create_weather_app():
 
                 tk.Label(f_card, text=f"{temp:.1f}°C", font=forecast_temp_font, bg=th["bg"], fg=th["fg"]).pack()
 
-        # 7-Day Forecast
         if daily_data and "daily" in daily_data:
             daily = daily_data["daily"]
             for i in range(7):
@@ -563,7 +556,6 @@ def create_weather_app():
                 day_name = datetime.strptime(date_str, "%Y-%m-%d").strftime("%a")
                 cond = get_condition_from_wmo(wmo_code)
 
-                # Highlight "Today"
                 if i == 0: day_name = "Today"
 
                 d_card = tk.Frame(daily_container, bg=th["bg"], padx=8, pady=8, bd=1, relief="ridge")
@@ -604,7 +596,6 @@ def create_weather_app():
             aqi_resp = requests.get(AIR_POLLUTION_URL, params=aqi_params, timeout=8)
             if aqi_resp.status_code == 200: aqi_data = aqi_resp.json()
 
-            # ── NEW: Request "hourly" along with daily data ──
             daily_data = None
             om_params = {
                 "latitude": lat,
@@ -612,12 +603,11 @@ def create_weather_app():
                 "hourly": "temperature_2m,weathercode",
                 "daily": "weathercode,temperature_2m_max,temperature_2m_min",
                 "timezone": "auto",
-                "forecast_days": 7  # Fetch 3 days to ensure we have a full 24h ahead
+                "forecast_days": 7  
             }
             om_resp = requests.get(OPEN_METEO_URL, params=om_params, timeout=8)
             if om_resp.status_code == 200: daily_data = om_resp.json()
 
-            # Passed to GUI
             root.after(0, show_data, current_data, aqi_data, daily_data, source)
 
         except requests.exceptions.ConnectionError:

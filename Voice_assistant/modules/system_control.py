@@ -94,7 +94,6 @@ def close_app(app_name):
     return f"I couldn't find {app_name} running."
 
 def manage_folder(action, folder_name):
-    # Defaulting to the Desktop for safety
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
     target_path = os.path.join(desktop_path, folder_name.title())
 

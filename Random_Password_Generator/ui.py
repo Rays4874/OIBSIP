@@ -27,11 +27,9 @@ class PasswordGeneratorApp:
         self.root.resizable(False, False)
         self.root.configure(bg="#1E1B2E")
 
-        # Load Preferences
         self.settings = storage.load_settings()
         self.history = []
 
-        # Intercept window close to save settings
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.setup_fonts_and_colors()
@@ -39,12 +37,11 @@ class PasswordGeneratorApp:
         self.setup_ui()
         self.apply_loaded_settings()
 
-        # Try to load icon
         try:
             icon_img = tk.PhotoImage(file=os.path.join("assets", "icon.png"))
             self.root.iconphoto(False, icon_img)
         except Exception:
-            pass  # Fails silently if no icon is provided
+            pass 
 
     def setup_fonts_and_colors(self):
         self.heading_font = tkfont.Font(family="Segoe UI", size=20, weight="bold")
@@ -101,10 +98,8 @@ class PasswordGeneratorApp:
         self.policy_var.set(policy)
         self.lbl_policy_val.config(text=policy)
 
-        #self.generate_password()
 
     def on_closing(self):
-        # Save current UI state to settings dict
         self.settings = {
             "length": int(self.length_var.get()),
             "uppercase": self.var_upper.get(),
@@ -119,19 +114,16 @@ class PasswordGeneratorApp:
         self.root.destroy()
 
     def setup_ui(self):
-        # Master Frames
         left_frame = tk.Frame(self.root, bg=self.BG)
         left_frame.pack(side="left", fill="both", expand=True, padx=20, pady=20)
 
         right_frame = tk.Frame(self.root, bg=self.CARD_BG, width=300)
         right_frame.pack(side="right", fill="y", padx=(0, 20), pady=20)
 
-        # --- LEFT FRAME (Generator) ---
         tk.Label(left_frame, text="Advanced Password Generator", font=self.heading_font, bg=self.BG, fg=self.TEXT).pack(
             anchor="w")
         tk.Frame(left_frame, bg=self.ACCENT, height=2, width=400).pack(anchor="w", pady=(5, 15))
 
-        # Controls
         ctrl_frame = tk.Frame(left_frame, bg=self.BG)
         ctrl_frame.pack(fill="x", pady=5)
 
@@ -146,7 +138,6 @@ class PasswordGeneratorApp:
                                     command=self.apply_policy)
         policy_menu.pack(side="left")
 
-        # Checkboxes
         chk_frame = tk.Frame(left_frame, bg=self.PANEL_BG)
         chk_frame.pack(fill="x", pady=10, ipadx=10, ipady=10)
 
@@ -165,12 +156,10 @@ class PasswordGeneratorApp:
         self.create_check(chk_frame, self.var_exclude_ambig, "☑ Exclude Ambiguous (0, O, l, 1)")
         self.create_check(chk_frame, self.var_prevent_rep, "☑ Prevent Repeated Characters")
 
-        # Output area
         self.password_var = tk.StringVar()
         tk.Entry(left_frame, textvariable=self.password_var, font=self.entry_font, justify="center", bg="white",
                  fg="black", readonlybackground="white", state="readonly").pack(fill="x", ipady=12, pady=10)
 
-        # Buttons
         btn_frame = tk.Frame(left_frame, bg=self.BG)
         btn_frame.pack(fill="x", pady=5)
         tk.Button(btn_frame, text="⚡ Generate Password", bg=self.ACCENT, fg=self.TEXT, font=("Segoe UI", 11, "bold"),
@@ -178,7 +167,6 @@ class PasswordGeneratorApp:
         tk.Button(btn_frame, text="📋 Copy", bg=self.PANEL_BG, fg=self.TEXT, font=("Segoe UI", 11, "bold"),
                   command=self.copy_password).pack(side="left", expand=True, fill="x", padx=(5, 0), ipady=5)
 
-        # Info Panel
         info_frame = tk.Frame(left_frame, bg=self.PANEL_BG)
         info_frame.pack(fill="x", pady=15, ipadx=10, ipady=10)
         self.lbl_strength_val = self.add_info_row(info_frame, "Strength:")
@@ -194,7 +182,6 @@ class PasswordGeneratorApp:
             x0 = i * (self.BAR_W + self.BAR_GAP)
             self.canvas_bar.create_rectangle(x0, 0, x0 + self.BAR_W, self.BAR_H, fill=self.BAR_EMPTY, outline="")
 
-        # --- RIGHT FRAME (History) ---
         tk.Label(right_frame, text="Recent Passwords", font=("Segoe UI", 14, "bold"), bg=self.CARD_BG,
                  fg=self.TEXT).pack(pady=(15, 5))
 
@@ -267,18 +254,14 @@ class PasswordGeneratorApp:
             messagebox.showerror("Validation Error", str(e))
 
     def update_security_panel(self, pwd, pool_size):
-        # 1. Calculate the score, category, and entropy
         score, category = security.calculate_strength(pwd)
         entropy = security.calculate_entropy(len(pwd), pool_size)
 
-        # 2. THIS IS THE MISSING LINE: Define the 'colour' based on the category
         colour = security.STRENGTH_COLOURS.get(category, self.TEXT)
 
-        # 3. Update the text labels
         self.lbl_strength_val.config(text=category, fg=colour)
         self.lbl_entropy_val.config(text=f"{entropy:.1f} bits")
 
-        # 4. Animate the meter using the 'colour' we defined above
         filled = round(self.BAR_SEGMENTS * score / 7)
         self.canvas_bar.delete("all")
         for i in range(self.BAR_SEGMENTS):
@@ -296,7 +279,6 @@ class PasswordGeneratorApp:
         self.root.update()
 
     def add_to_history(self, pwd):
-        # Prevent consecutive duplicates
         if self.history and self.history[0] == pwd:
             return
 

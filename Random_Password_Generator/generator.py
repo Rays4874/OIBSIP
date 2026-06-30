@@ -24,7 +24,6 @@ def generate_custom_password(length, use_upper, use_lower, use_digits, use_sym, 
     if not pool_str:
         raise ValueError("Please select at least one character type.")
 
-    # Rule: Exclude Ambiguous
     if excl_ambig:
         ambiguous = "0OIl15S2Z"
         pool_str = "".join([c for c in pool_str if c not in ambiguous])
@@ -40,7 +39,6 @@ def generate_custom_password(length, use_upper, use_lower, use_digits, use_sym, 
 
     pool_size = len(set(pool_str))
 
-    # Rule: Prevent Repeats
     if prev_rep:
         if length > pool_size:
             raise ValueError(
@@ -61,12 +59,10 @@ def generate_custom_password(length, use_upper, use_lower, use_digits, use_sym, 
             chars.extend(secure_sampler.sample(list(available), length - len(chars)))
 
     else:
-        # Standard Generation
         guaranteed = [secrets.choice(g) for g in mandatory_groups]
         filler = [secrets.choice(pool_str) for _ in range(length - len(guaranteed))]
         chars = guaranteed + filler
-
-    # Shuffle
+        
     for i in range(len(chars) - 1, 0, -1):
         j = secrets.randbelow(i + 1)
         chars[i], chars[j] = chars[j], chars[i]
