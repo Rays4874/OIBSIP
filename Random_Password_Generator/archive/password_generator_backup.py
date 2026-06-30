@@ -4,14 +4,12 @@ import secrets
 import string
 import math
 
-# ── Main window setup ────────────────────────────────────────────────
 root = tk.Tk()
 root.title("Advanced Password Generator")
 root.geometry("550x850")
 root.resizable(False, False)
 root.configure(bg="#1E1B2E")
 
-# ── Fonts ─────────────────────────────────────────────────────────────
 heading_font = tkfont.Font(family="Segoe UI", size=20, weight="bold")
 subtext_font = tkfont.Font(family="Segoe UI", size=10)
 label_font = tkfont.Font(family="Segoe UI", size=10)
@@ -22,7 +20,6 @@ entry_font = tkfont.Font(family="Courier New", size=13, weight="bold")
 spinbox_font = tkfont.Font(family="Segoe UI", size=11, weight="bold")
 strength_font = tkfont.Font(family="Segoe UI", size=10, weight="bold")
 
-# ── Colours ───────────────────────────────────────────────────────────
 BG = "#1E1B2E"
 CARD_BG = "#2A2640"
 PANEL_BG = "#221F36"
@@ -46,9 +43,6 @@ STRENGTH_COLOURS = {
 }
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  Security & Strength Logic
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 def calculate_strength(password: str) -> tuple[int, str]:
     score = 0
     n = len(password)
@@ -83,22 +77,18 @@ BAR_GAP = 3
 
 
 def update_security_panel(password: str, pool_size: int, types_count: int) -> None:
-    # 1. Strength
     score, category = calculate_strength(password)
     colour = STRENGTH_COLOURS[category]
     lbl_strength_val.config(text=category, fg=colour)
 
-    # 2. Entropy
     if pool_size > 0:
         entropy = len(password) * math.log2(pool_size)
         lbl_entropy_val.config(text=f"{entropy:.1f} bits")
     else:
         lbl_entropy_val.config(text="0.0 bits")
 
-    # 3. Char Types
     lbl_types_val.config(text=str(types_count))
 
-    # 4. Update visual bar
     filled = round(BAR_SEGMENTS * score / 7)
     canvas_bar.delete("all")
     for i in range(BAR_SEGMENTS):
@@ -108,7 +98,6 @@ def update_security_panel(password: str, pool_size: int, types_count: int) -> No
         canvas_bar.create_rectangle(x0, 0, x1, BAR_H, fill=fill, outline="")
 
 
-# ── Policy Preset Applicator ──────────────────────────────────────────
 def apply_policy(selection):
     if selection == "Standard":
         var_upper.set(True);
@@ -138,7 +127,6 @@ def apply_policy(selection):
     lbl_policy_val.config(text=selection)
 
 
-# ── Password generation ───────────────────────────────────────────────
 def generate_password():
     try:
         length = int(length_var.get())
@@ -168,7 +156,6 @@ def generate_password():
         messagebox.showerror("Error", "Please select at least one character type.")
         return
 
-    # Task 7 - Feature 1: Exclude Ambiguous
     if var_exclude_ambig.get():
         ambiguous = "0OIl15S2Z"
         pool_str = "".join([c for c in pool_str if c not in ambiguous])
@@ -185,7 +172,6 @@ def generate_password():
 
     pool_size = len(set(pool_str))
 
-    # Task 7 - Feature 2: Prevent Repeated Characters
     if var_prevent_rep.get():
         if length > pool_size:
             messagebox.showerror(
@@ -198,7 +184,6 @@ def generate_password():
         available = set(pool_str)
         chars = []
 
-        # Fulfill mandatory requirements first
         for group in mandatory_groups:
             valid_choices = list(set(group) & available)
             if valid_choices:
@@ -206,18 +191,15 @@ def generate_password():
                 chars.append(choice)
                 available.remove(choice)
 
-        # Fill remaining slots using secure random sample
         if len(chars) < length:
             secure_sampler = secrets.SystemRandom()
             chars.extend(secure_sampler.sample(list(available), length - len(chars)))
 
     else:
-        # Standard Generation
         guaranteed = [secrets.choice(g) for g in mandatory_groups]
         filler = [secrets.choice(pool_str) for _ in range(length - len(guaranteed))]
         chars = guaranteed + filler
 
-    # Shuffle the final array
     for i in range(len(chars) - 1, 0, -1):
         j = secrets.randbelow(i + 1)
         chars[i], chars[j] = chars[j], chars[i]
@@ -225,15 +207,13 @@ def generate_password():
     password = "".join(chars)
     password_var.set(password)
 
-    # If user changed settings manually, update policy to Custom
     if policy_var.get() not in ["Standard", "Strong", "Enterprise"]:
         lbl_policy_val.config(text="Custom")
 
     update_security_panel(password, pool_size, len(mandatory_groups))
-    copy_status_var.set("")  # Clear copy status
+    copy_status_var.set("") 
 
 
-# ── Clipboard Integration ─────────────────────────────────────────────
 def copy_password():
     password = password_var.get()
     if not password:
@@ -248,9 +228,6 @@ def copy_password():
     root.after(2500, lambda: copy_status_var.set(""))
 
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#  UI Layout
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 tk.Frame(root, bg=ACCENT, height=4).pack(fill="x", side="top")
 
 card = tk.Frame(root, bg=CARD_BG, bd=0, relief="flat")
@@ -261,11 +238,9 @@ tk.Label(card, text="Advanced Password Generator", font=heading_font, bg=CARD_BG
 tk.Label(card, text="Secure · Customisable · Instant", font=subtext_font, bg=CARD_BG, fg=MUTED).pack(pady=(0, 8))
 tk.Frame(card, bg=ACCENT, height=1, width=380).pack(pady=(0, 10))
 
-# ── Controls Row (Length & Policy) ────────────────────────────────────
 controls_row = tk.Frame(card, bg=CARD_BG)
 controls_row.pack(pady=(0, 10), fill="x", padx=32)
 
-# Length
 tk.Label(controls_row, text="Length:", font=label_font, bg=CARD_BG, fg=MUTED).pack(side="left")
 length_var = tk.StringVar(value="16")
 tk.Spinbox(
@@ -274,7 +249,6 @@ tk.Spinbox(
     bd=0, bg=SPIN_BG, fg=SPIN_FG, buttonbackground=CARD_BG, wrap=False,
 ).pack(side="left", ipady=3, padx=(6, 20))
 
-# Policy
 tk.Label(controls_row, text="Policy:", font=label_font, bg=CARD_BG, fg=MUTED).pack(side="left")
 policy_var = tk.StringVar(value="Enterprise")
 policy_menu = tk.OptionMenu(controls_row, policy_var, "Custom", "Standard", "Strong", "Enterprise",
@@ -284,7 +258,6 @@ policy_menu.config(bg=PANEL_BG, fg=TEXT, activebackground=ENTRY_BG, activeforegr
 policy_menu["menu"].config(bg=PANEL_BG, fg=TEXT)
 policy_menu.pack(side="left", padx=(6, 0), fill="x", expand=True)
 
-# ── Checkboxes ────────────────────────────────────────────────────────
 chk_panel = tk.Frame(card, bg=PANEL_BG)
 chk_panel.pack(fill="x", padx=32, pady=(0, 8), ipadx=8, ipady=5)
 
@@ -313,7 +286,6 @@ tk.Frame(chk_panel, bg=CARD_BG, height=1).pack(fill="x", pady=6, padx=10)
 create_check(chk_panel, var_exclude_ambig, "☑ Exclude Ambiguous", "(0, O, I, l, 1)")
 create_check(chk_panel, var_prevent_rep, "☑ Prevent Repeated Characters")
 
-# ── Password Entry & Inline Copy Button ───────────────────────────────
 pwd_container = tk.Frame(card, bg=ENTRY_BG)
 pwd_container.pack(pady=(10, 3))
 
@@ -333,7 +305,6 @@ copy_icon_btn.pack(side="right", padx=(0, 8), ipady=8)
 copy_status_var = tk.StringVar(value="")
 tk.Label(card, textvariable=copy_status_var, font=("Segoe UI", 9, "bold"), bg=CARD_BG, fg=CHK_SEL).pack(pady=(0, 6))
 
-# ── Information Panel ─────────────────────────────────────────────────
 info_frame = tk.Frame(card, bg=PANEL_BG)
 info_frame.pack(fill="x", padx=32, pady=(0, 12), ipadx=10, ipady=8)
 
@@ -354,7 +325,6 @@ lbl_policy_val = add_info_row(info_frame, "Active Policy:")
 
 lbl_policy_val.config(text="Enterprise")  # Initial state
 
-# ── Strength Bar ──────────────────────────────────────────────────────
 canvas_total_w = BAR_SEGMENTS * (BAR_W + BAR_GAP) - BAR_GAP
 canvas_bar = tk.Canvas(card, width=canvas_total_w, height=BAR_H, bg=CARD_BG, highlightthickness=0)
 canvas_bar.pack(pady=(0, 16))
@@ -363,7 +333,6 @@ for i in range(BAR_SEGMENTS):
     canvas_bar.create_rectangle(i * (BAR_W + BAR_GAP), 0, i * (BAR_W + BAR_GAP) + BAR_W, BAR_H, fill=BAR_EMPTY,
                                 outline="")
 
-# ── Generate Button ───────────────────────────────────────────────────
 generate_btn = tk.Button(
     card, text="  ⚡  Generate Password", font=button_font,
     bg=ACCENT, fg=TEXT, activebackground=ACCENT_HV, activeforeground=TEXT,
@@ -371,10 +340,8 @@ generate_btn = tk.Button(
 )
 generate_btn.pack(pady=(0, 8))
 
-# ── Footer ────────────────────────────────────────────────────────────
 tk.Label(root, text="Powered by Python · cryptographically secure", font=("Segoe UI", 8), bg=BG, fg=MUTED).pack(
     side="bottom", pady=8)
 
-# Initial population
 generate_password()
 root.mainloop()
