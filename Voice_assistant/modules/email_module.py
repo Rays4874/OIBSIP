@@ -87,7 +87,7 @@ def send_email(recipient, subject, message):
 
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls() # Secure the connection
+        server.starttls()
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(msg)
         server.quit()
