@@ -8,7 +8,6 @@ import webbrowser
 import subprocess
 from dotenv import load_dotenv
 
-# Import our custom modules
 from modules import wake_word
 from modules import plugin_manager
 from modules import memory
@@ -388,7 +387,6 @@ import time
 
 
 class AIEngineThread(QThread):
-    # These signals send data from the background AI back to the main GUI
     log_signal = pyqtSignal(str)
     state_signal = pyqtSignal(str)
     stats_signal = pyqtSignal(float, float, str)
