@@ -4,10 +4,12 @@ import asyncio
 import pygame
 import datetime
 import os
+import threading
 import webbrowser
 import subprocess
 from dotenv import load_dotenv
 
+# Import our custom modules
 from modules import wake_word
 from modules import plugin_manager
 from modules import memory
@@ -67,25 +69,72 @@ def greet_user():
         speak(f"Good evening! I am {AI_NAME}. How can I help you today?")
 
 
-def listen_command(timeout=8, phrase_time_limit=20):
+def listen_command(timeout=8, phrase_time_limit=30):
     recognizer = sr.Recognizer()
-    recognizer.pause_threshold = 0.5
+
+    recognizer.dynamic_energy_threshold = True
+    recognizer.energy_threshold = 300
+    recognizer.dynamic_energy_adjustment_damping = 0.15
+    recognizer.dynamic_energy_ratio = 1.5
+
+    recognizer.pause_threshold = 2.5
+    recognizer.phrase_threshold =0.3
+    recognizer.non_speaking_duration = 0.8
+
     with sr.Microphone() as source:
+        print("\nCalibrating microphone...")
+        recognizer.adjust_for_ambient_noise(source, duration=2)
+
+        print(f"[Energy Threshold: {recognizer.energy_threshold:.2f}]")
         print("\n[ Listening... ]")
-        recognizer.adjust_for_ambient_noise(source, duration=0.2)
+
         try:
-            audio = recognizer.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+            audio = recognizer.listen(
+                source,
+                timeout=timeout,
+                phrase_time_limit=phrase_time_limit
+            )
+
             print("[ Recognizing... ]")
-            command = recognizer.recognize_google(audio).lower()
+
+            result = recognizer.recognize_google(
+                audio,
+                language="en-IN",
+                show_all=True
+            )
+
+            if isinstance(result, dict):
+                alternatives = result.get("alternative", [])
+
+                if not alternatives:
+                    print(f"{AI_NAME}: (Could not understand the audio)")
+                    return None
+
+                command = alternatives[0]["transcript"].lower()
+
+            else:
+                command = result.lower()
+
             print(f"User Command: '{command}'")
+
             return command
+
         except sr.UnknownValueError:
-            print(f"{AI_NAME}: (Could not understand the audio)")
+            print(f"{AI_NAME}: Sorry, I couldn't understand that. Please try again.")
             return None
+
         except sr.RequestError as e:
-            print(f"{AI_NAME}: Service error. {e}")
+            print(f"{AI_NAME}: Speech recognition service is unavailable.")
+            print(f"Error: {e}")
             return None
+
         except sr.WaitTimeoutError:
+            print(f"{AI_NAME}: Listening timed out.")
+            return None
+
+        except Exception as e:
+            print(f"{AI_NAME}: Unexpected error.")
+            print(f"Error: {e}")
             return None
 
 
@@ -385,8 +434,13 @@ from gui.dashboard import VectorDashboard
 import sys
 import time
 
+def reminder_service():
+    while True:
+        reminder.process_due_reminders(speak)
+        time.sleep(1)
 
 class AIEngineThread(QThread):
+    # These signals send data from the background AI back to the main GUI
     log_signal = pyqtSignal(str)
     state_signal = pyqtSignal(str)
     stats_signal = pyqtSignal(float, float, str)
@@ -420,10 +474,14 @@ class AIEngineThread(QThread):
         greet_user()
         self.update_gui_readouts()
 
+        threading.Thread(
+            target=reminder_service,
+            daemon=True
+        ).start()
+
         is_running = True
         while is_running:
             self.update_gui_readouts()
-            reminder.process_due_reminders(speak)
 
             self.state_signal.emit("standby")
             detected = wake_word.wait_for_wake_word()
